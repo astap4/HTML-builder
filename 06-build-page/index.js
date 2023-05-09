@@ -2,24 +2,17 @@ const fs = require('fs');
 const path = require('path');
 const newFolder = path.join(__dirname, 'project-dist');
 
-const stylesFolder = path.join(__dirname, 'styles');
-const bundleFile = path.join(__dirname, 'project-dist', 'style.css');
-const newData = fs.createWriteStream(bundleFile);
-
-const imgFolder = path.join(__dirname, 'assets');
-const imgFolderCopy = path.join(__dirname, 'project-dist','assets');
-
 // function cleanDir() {
-//   fs.readdir(copyFolder, (err, files) => {
+//   fs.readdir(newFolder, (err, files) => {
 //     if (err) return null;
 //     files.forEach(file => {
-//       fs.unlink(path.join(copyFolder, file), (err) => {
+//       fs.unlink(path.join(newFolder, file), (err) => {
 //         if (err) throw err;
 //       });
 //     });
 //   });
 // }
-
+// cleanDir();
 function createNewFolder() {
   fs.mkdir(newFolder, { recursive: true }, (err) => {
     if (err) {
@@ -32,6 +25,10 @@ function createNewFolder() {
 createNewFolder();
 
 //merge styles
+const stylesFolder = path.join(__dirname, 'styles');
+const bundleFile = path.join(__dirname, 'project-dist', 'style.css');
+const newData = fs.createWriteStream(bundleFile);
+
 fs.writeFile(bundleFile, '', (err) => {
   if (err)
     console.log(err);
@@ -57,9 +54,39 @@ fs.readdir(stylesFolder, (err, files) => {
   }
 });
 
+//copy img folder
+const imgFolder = path.join(__dirname, 'assets');
+const imgFolderCopy = path.join(__dirname, 'project-dist','assets');
+
+function copyFolder(source, destination) {
+  fs.mkdir(destination, { recursive: true }, (err) => {
+    if (err) {
+      console.error(err);
+      return;
+    }
+  });
+  fs.readdir(source, { withFileTypes: true }, (err, files) => {
+    if (err) {
+      console.log(err);
+    } else {
+      files.forEach(file => {
+        const currentPath = path.join(source, file.name);
+        const newPath = path.join(destination, file.name);
+        if (file.isDirectory()) {
+          copyFolder(currentPath, newPath);
+        } else if (file.isFile()) {
+          fs.copyFile(currentPath, newPath, (err) => {
+            if (err) {
+              console.log(err);}
+          });
+        }
+      });
+    }
+  });
+}
+copyFolder(imgFolder, imgFolderCopy);
 
 //add html
-
 const componentsFolder = path.join(__dirname, 'components');
 const templateHtmlPath = path.join(__dirname, 'template.html');
 const outputHtmlPath = path.join(__dirname, 'project-dist', 'index.html');
