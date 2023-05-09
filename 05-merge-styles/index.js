@@ -23,6 +23,7 @@ fs.readdir(stylesFolder, (err, files) => {
           function (error, data) {
             if (error) throw error;
             newData.write(data);
+            newData.write('\n'); // добавляем пустую строку
           });
       } 
     });

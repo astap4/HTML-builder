@@ -15,8 +15,8 @@ fs.readdir(newFolder,
             console.log(error);
           }
           else if(stats.isFile()===true) {
-            const name = file.name.split('.')[0];
-            const extension = file.name.split('.')[1]; 
+            const name = path.parse(file.name).name;
+            const extension = path.extname(file.name).slice(1);
             const size = (stats.size/1024).toFixed(3); 
             console.log(`${name} - ${extension} - ${size}kb`);
           }
